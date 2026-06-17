@@ -1,25 +1,31 @@
-<!DOCTYTPE html>
-<html>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カレンダー</title>
+<link rel="stylesheet" href="style.css">
+</head>
 <body>
+<div class="wrap">
+  <div class="header">
+    <button class="nav" id="prev">＜</button>
+    <div class="month-title" id="title"></div>
+    <button class="nav" id="next">＞</button>
+  </div>
+  <div class="grid" id="grid">
+    <div class="lbl">日</div><div class="lbl">月</div><div class="lbl">火</div>
+    <div class="lbl">水</div><div class="lbl">木</div><div class="lbl">金</div><div class="lbl">土</div>
+  </div>
+</div>
 
-<h1>カレンダー</h1>
-
-<button onclick="prevMonth()">前の月</button>
-
-<span id="monthTitle"></span>
-
-<button onclick="nextMonth()">次の月</button>
-
-<div id="calendar"></div>
-
-<p id="date"></p>
-
-<textarea id="memo"></textarea><br>
-
-<button onclick="save()">保存</button>
-
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content" role="dialog" aria-modal="true">
+    <button class="modal-close" id="modalClose" type="button">×</button>
+    <pre id="modalText" class="modal-text">日付をクリックするとここに表示されます。</pre>
+  </div>
+</div>
 <script src="script.js"></script>
-
 </body>
-
 </html>
