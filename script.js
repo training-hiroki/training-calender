@@ -5,185 +5,374 @@ const modalText = document.getElementById('modalText');
 const modalClose = document.getElementById('modalClose');
 
 const pad2 = (value) => String(value).padStart(2, '0');
-const getGitHubJsonUrl = () =>
-  `https://raw.githubusercontent.com/training-hiroki/strave-calendar-api/refs/heads/main/data.json`;
 
+const getGitHubJsonUrl = () =>
+'https://raw.githubusercontent.com/training-hiroki/strave-calendar-api/main/data.json';
 
 let githubData = null;
 let githubDataPromise = null;
 
 const loadGitHubDataJson = async () => {
+
   if (githubData) return githubData;
+
   if (!githubDataPromise) {
-    githubDataPromise = fetch(getGitHubJsonUrl())
+
+    githubDataPromise =
+      fetch(getGitHubJsonUrl())
       .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
         return res.json();
+
       })
       .then((json) => {
+
         githubData = json;
-        return githubData;
+
+        return json;
+
       })
       .catch((err) => {
+
         githubDataPromise = null;
+
         throw err;
+
       });
+
   }
+
   return githubDataPromise;
+
 };
 
-const getDateKey = (year, month, day) => `${year}-${pad2(month)}-${pad2(day)}`;
+const getDateKey = (year, month, day) =>
+`${year}-${pad2(month)}-${pad2(day)}`;
 
 const formatDateJapanese = (dateStr) => {
+
   if (!dateStr) return '';
-  const parts = String(dateStr).split('-');
-  if (parts.length !== 3) return dateStr;
-  const y = parts[0];
-  const m = String(parseInt(parts[1], 10));
-  const d = String(parseInt(parts[2], 10));
-  return `${y}年 ${m}月 ${d}日`;
+
+  const parts =
+    String(dateStr)
+    .split('-');
+
+  return `${parts[0]}年 ${Number(parts[1])}月 ${Number(parts[2])}日`;
+
 };
 
-const formatActivity = (item) => {
+const formatActivity = (item, index = null) => {
+
   if (!item) return '';
-  const dateText = formatDateJapanese(item.date || '');
-  const movingTime = item.moving_time_text || (item.moving_time_sec ? `${Math.floor(item.moving_time_sec/60)}:${pad2(item.moving_time_sec%60)}` : '');
-  const minimal = {
-    date: item.date,
-    name: item.name,
-    type: item.type,
-    distance_km: item.distance_km,
-    moving_time_sec: item.moving_time_sec,
-    moving_time_text: item.moving_time_text || movingTime,
-    pace: item.pace,
-    avg_heartrate: item.avg_heartrate,
-    max_heartrate: item.max_heartrate
-  };
+
+  const movingTime =
+    item.moving_time_text ||
+    (
+      item.moving_time_sec
+      ? `${Math.floor(item.moving_time_sec / 60)}:${pad2(item.moving_time_sec % 60)}`
+      : ''
+    );
 
   let s = '';
-  if (dateText) s += `選択した日付: ${dateText}\n`;
-  if (item.name) s += `活動名: ${item.name}\n`;
-  if (item.type) s += `種別: ${item.type}\n`;
-  if (item.distance_km != null) s += `距離: ${item.distance_km} km\n`;
-  if (movingTime) s += `移動時間: ${movingTime}\n`;
-  if (item.pace) s += `ペース: ${item.pace}\n`;
-  if (item.avg_heartrate != null) s += `平均心拍: ${item.avg_heartrate} bpm\n`;
-  if (item.max_heartrate != null) s += `最大心拍: ${item.max_heartrate} bpm\n`;
-  s += `\nJSON: ${JSON.stringify(minimal)}`;
+
+  if (index !== null) {
+    s += `【${index + 1}本目】\n\n`;
+  }
+
+  if (item.name) {
+    s += `活動名: ${item.name}\n`;
+  }
+
+  if (item.type) {
+    s += `種別: ${item.type}\n`;
+  }
+
+  if (item.distance_km != null) {
+    s += `距離: ${item.distance_km} km\n`;
+  }
+
+  if (movingTime) {
+    s += `移動時間: ${movingTime}\n`;
+  }
+
+  if (item.pace) {
+    s += `ペース: ${item.pace}\n`;
+  }
+
+  if (item.avg_heartrate != null) {
+    s += `平均心拍: ${item.avg_heartrate} bpm\n`;
+  }
+
+  if (item.max_heartrate != null) {
+    s += `最大心拍: ${item.max_heartrate} bpm\n`;
+  }
+
   return s;
+
 };
 
 const showDialog = (text) => {
+
   modalText.textContent = text;
+
   modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
+
+  modal.setAttribute(
+    'aria-hidden',
+    'false'
+  );
+
 };
 
-const loadGitHubData = async (year, month, day) => {
-  const key = getDateKey(year, month, day);
-  showDialog(`${year}年 ${month}月 ${day}日\n読み込み中...`);
+const loadGitHubData = async (
+  year,
+  month,
+  day
+) => {
+
+  const key =
+    getDateKey(
+      year,
+      month,
+      day
+    );
+
+  showDialog('読み込み中...');
+
   try {
-    const data = await loadGitHubDataJson();
-    // data.json が配列なら、その中から date フィールドで検索
-    const items = Array.isArray(data) ? data : [data];
-    const foundItems = items.filter(item => item && item.date === key);
-    
-    if (foundItems.length === 0) {
-      showDialog(`選択した日付: ${year}年 ${month}月 ${day}日\nデータが見つかりませんでした。`);
-    } else if (foundItems.length === 1) {
-      const formatted = formatActivity(foundItems[0]);
-      showDialog(formatted);
-    } else {
-      const formattedList = foundItems.map((it) => formatActivity(it)).join('\n\n---\n\n');
-      showDialog(formattedList);
+
+    const data =
+      await loadGitHubDataJson();
+
+    const items =
+      Array.isArray(data)
+      ? data
+      : [data];
+
+    const foundItems =
+      items.filter(
+        item =>
+          item &&
+          item.date === key
+      );
+
+    if (
+      foundItems.length === 0
+    ) {
+
+      showDialog(
+`${year}年 ${month}月 ${day}日
+
+データがありません`
+      );
+
+      return;
+
     }
-  } catch (error) {
-    console.error(error);
-    showDialog(`データの取得に失敗しました。\n${error.message}`);
+
+    let text =
+`${year}年 ${month}月 ${day}日
+
+`;
+
+    text +=
+      foundItems
+      .map(
+        (
+          item,
+          index
+        ) =>
+          formatActivity(
+            item,
+            foundItems.length > 1
+              ? index
+              : null
+          )
+      )
+      .join(
+        '\n-----------------\n\n'
+      );
+
+    showDialog(text);
+
   }
+
+  catch (error) {
+
+    console.error(error);
+
+    showDialog(
+`取得失敗
+
+${error.message}`
+    );
+
+  }
+
 };
 
 const closeDialog = () => {
+
   modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
+
+  modal.setAttribute(
+    'aria-hidden',
+    'true'
+  );
+
 };
 
-modalClose.addEventListener('click', closeDialog);
-modal.addEventListener('click', (event) => {
-  if (event.target === modal) closeDialog();
-});
+modalClose.addEventListener(
+'click',
+closeDialog
+);
 
-function render() {
-  const y = cur.getFullYear(), m = cur.getMonth();
-  document.getElementById('title').textContent = `${y}年 ${m+1}月`;
-  const grid = document.getElementById('grid');
-  Array.from(grid.children).forEach(c => { if (!c.classList.contains('lbl')) c.remove(); });
+modal.addEventListener(
+'click',
+(event) => {
 
-  const first = new Date(y, m, 1).getDay();
-  const days = new Date(y, m+1, 0).getDate();
-  const prevDays = new Date(y, m, 0).getDate();
-  const today = new Date();
-  const isToday = (d) => today.getFullYear()===y && today.getMonth()===m && today.getDate()===d;
-
-  for (let i = 0; i < first; i++) {
-    const c = document.createElement('button');
-    c.type = 'button';
-    c.className = 'cell other';
-    const dow = i % 7;
-    if (dow === 0) c.classList.add('sun');
-    if (dow === 6) c.classList.add('sat');
-    const day = prevDays - first + 1 + i;
-    c.textContent = day;
-    c.addEventListener('click', () => {
-      const year = m === 0 ? y - 1 : y;
-      const month = m === 0 ? 12 : m;
-      loadGitHubData(year, month, day);
-    });
-    grid.appendChild(c);
-  }
-
-  for (let d = 1; d <= days; d++) {
-    const c = document.createElement('button');
-    c.type = 'button';
-    const dow = (first + d - 1) % 7;
-    c.className = 'cell';
-    if (dow === 0) c.classList.add('sun');
-    if (dow === 6) c.classList.add('sat');
-    if (isToday(d)) c.classList.add('today');
-    c.textContent = d;
-    c.addEventListener('click', () => {
-      loadGitHubData(y, m + 1, d);
-    });
-    grid.appendChild(c);
-  }
-
-  const total = first + days;
-  const rem = total % 7 === 0 ? 0 : 7 - (total % 7);
-  for (let d = 1; d <= rem; d++) {
-    const c = document.createElement('button');
-    c.type = 'button';
-    const dow = (total + d - 1) % 7;
-    c.className = 'cell other';
-    if (dow === 0) c.classList.add('sun');
-    if (dow === 6) c.classList.add('sat');
-    const day = d;
-    c.textContent = day;
-    c.addEventListener('click', () => {
-      const year = m === 11 ? y + 1 : y;
-      const month = m === 11 ? 1 : m + 2;
-      loadGitHubData(year, month, day);
-    });
-    grid.appendChild(c);
-  }
+if (
+event.target === modal
+) {
+closeDialog();
 }
 
-document.getElementById('prev').addEventListener('click', () => {
-  cur = new Date(cur.getFullYear(), cur.getMonth() - 1, 1);
-  render();
-});
-document.getElementById('next').addEventListener('click', () => {
-  cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
-  render();
-});
+}
+);
+
+function render() {
+
+const y =
+cur.getFullYear();
+
+const m =
+cur.getMonth();
+
+document
+.getElementById(
+'title'
+)
+.textContent =
+`${y}年 ${m+1}月`;
+
+const grid =
+document.getElementById(
+'grid'
+);
+
+Array
+.from(
+grid.children
+)
+.forEach(
+c => {
+
+if (
+!c.classList.contains(
+'lbl'
+)
+)
+c.remove();
+
+}
+);
+
+const first =
+new Date(
+y,
+m,
+1
+)
+.getDay();
+
+const days =
+new Date(
+y,
+m+1,
+0
+)
+.getDate();
+
+for (
+let d=1;
+d<=days;
+d++
+) {
+
+const c =
+document.createElement(
+'button'
+);
+
+c.type =
+'button';
+
+c.className =
+'cell';
+
+c.textContent =
+d;
+
+c.addEventListener(
+'click',
+() =>
+loadGitHubData(
+y,
+m+1,
+d
+)
+);
+
+grid.appendChild(
+c
+);
+
+}
+
+}
+
+document
+.getElementById(
+'prev'
+)
+.addEventListener(
+'click',
+() => {
+
+cur =
+new Date(
+cur.getFullYear(),
+cur.getMonth()-1,
+1
+);
+
+render();
+
+}
+);
+
+document
+.getElementById(
+'next'
+)
+.addEventListener(
+'click',
+() => {
+
+cur =
+new Date(
+cur.getFullYear(),
+cur.getMonth()+1,
+1
+);
+
+render();
+
+}
+);
 
 render();
