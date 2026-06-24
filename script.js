@@ -34,6 +34,45 @@ const loadGitHubDataJson = async () => {
 
 const getDateKey = (year, month, day) => `${year}-${pad2(month)}-${pad2(day)}`;
 
+const formatDateJapanese = (dateStr) => {
+  if (!dateStr) return '';
+  const parts = String(dateStr).split('-');
+  if (parts.length !== 3) return dateStr;
+  const y = parts[0];
+  const m = String(parseInt(parts[1], 10));
+  const d = String(parseInt(parts[2], 10));
+  return `${y}年 ${m}月 ${d}日`;
+};
+
+const formatActivity = (item) => {
+  if (!item) return '';
+  const dateText = formatDateJapanese(item.date || '');
+  const movingTime = item.moving_time_text || (item.moving_time_sec ? `${Math.floor(item.moving_time_sec/60)}:${pad2(item.moving_time_sec%60)}` : '');
+  const minimal = {
+    date: item.date,
+    name: item.name,
+    type: item.type,
+    distance_km: item.distance_km,
+    moving_time_sec: item.moving_time_sec,
+    moving_time_text: item.moving_time_text || movingTime,
+    pace: item.pace,
+    avg_heartrate: item.avg_heartrate,
+    max_heartrate: item.max_heartrate
+  };
+
+  let s = '';
+  if (dateText) s += `選択した日付: ${dateText}\n`;
+  if (item.name) s += `活動名: ${item.name}\n`;
+  if (item.type) s += `種別: ${item.type}\n`;
+  if (item.distance_km != null) s += `距離: ${item.distance_km} km\n`;
+  if (movingTime) s += `移動時間: ${movingTime}\n`;
+  if (item.pace) s += `ペース: ${item.pace}\n`;
+  if (item.avg_heartrate != null) s += `平均心拍: ${item.avg_heartrate} bpm\n`;
+  if (item.max_heartrate != null) s += `最大心拍: ${item.max_heartrate} bpm\n`;
+  s += `\nJSON: ${JSON.stringify(minimal)}`;
+  return s;
+};
+
 const showDialog = (text) => {
   modalText.textContent = text;
   modal.classList.add('open');
@@ -52,9 +91,11 @@ const loadGitHubData = async (year, month, day) => {
     if (foundItems.length === 0) {
       showDialog(`選択した日付: ${year}年 ${month}月 ${day}日\nデータが見つかりませんでした。`);
     } else if (foundItems.length === 1) {
-      showDialog(`選択した日付: ${year}年 ${month}月 ${day}日\n\n${JSON.stringify(foundItems[0], null, 2)}`);
+      const formatted = formatActivity(foundItems[0]);
+      showDialog(formatted);
     } else {
-      showDialog(`選択した日付: ${year}年 ${month}月 ${day}日\n\n${JSON.stringify(foundItems, null, 2)}`);
+      const formattedList = foundItems.map((it) => formatActivity(it)).join('\n\n---\n\n');
+      showDialog(formattedList);
     }
   } catch (error) {
     console.error(error);
