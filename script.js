@@ -41,13 +41,68 @@ function renderSummary(y, m) {
   document.getElementById('monthRuns').textContent = `${monthItems.length}回のラン`;
 
   const today = new Date();
-  const sevenDaysAgo = new Date(today);
-  sevenDaysAgo.setDate(today.getDate() - 6);
 
-  const weekItems = allData.filter(item => {
-    const d = new Date(item.date);
-    return d >= sevenDaysAgo && d <= today;
-  });
+/* 月曜開始 */
+
+const monday = new Date(today);
+
+const dayOfWeek =
+today.getDay();
+
+const diff =
+dayOfWeek === 0
+? -6
+: 1 - dayOfWeek;
+
+monday.setDate(
+today.getDate()
++ diff
+);
+
+monday.setHours(
+0,
+0,
+0,
+0
+);
+
+/* 日曜終了 */
+
+const sunday =
+new Date(
+monday
+);
+
+sunday.setDate(
+monday.getDate()
++ 6
+);
+
+sunday.setHours(
+23,
+59,
+59,
+999
+);
+
+/* 今週(月〜日)抽出 */
+
+const weekItems =
+allData.filter(
+item => {
+
+const d =
+new Date(
+item.date
+);
+
+return (
+d >= monday &&
+d <= sunday
+);
+
+}
+);
 
   document.getElementById('weekDistance').textContent =
     `${sumDistance(weekItems).toFixed(2)} km`;
