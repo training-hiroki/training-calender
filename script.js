@@ -30,7 +30,9 @@ function getDateItems(dateKey) {
 }
 
 function sumDistance(items) {
-  return items.reduce((sum, item) => sum + Number(item.distance_km || 0), 0);
+  return items
+    .filter(item => item.type === 'ランニング')
+    .reduce((sum, item) => sum + Number(item.distance_km || 0), 0);
 }
 
 function getWeekRange(offset = 0) {
