@@ -6,42 +6,45 @@
 
 body {
   font-family: sans-serif;
-  padding: 2rem;
+  background: #fafafa;
+  color: #222;
+  padding: 24px;
 }
 
-.wrap {
-  padding: 1.5rem 0;
-  max-width: 800px;
+.layout {
+  display: grid;
+  grid-template-columns: minmax(620px, 1.4fr) minmax(360px, 0.8fr);
+  gap: 32px;
+  max-width: 1400px;
   margin: 0 auto;
+}
+
+.calendar-area {
+  background: #fff;
+  border-radius: 18px;
+  padding: 24px;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 2rem;
+  margin-bottom: 28px;
 }
 
 .month-title {
-  font-size: 24px;
-  font-weight: 500;
+  font-size: 28px;
+  font-weight: 700;
 }
 
 .nav {
-  background: none;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 10px;
+  font-size: 22px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-}
-
-.nav:hover {
-  background: #f5f5f5;
 }
 
 .grid {
@@ -52,126 +55,144 @@ body {
 
 .lbl {
   text-align: center;
-  font-size: 15px;
-  color: #888;
-  padding: 10px 0;
-  font-weight: 500;
+  font-weight: 700;
+  color: #777;
+  padding-bottom: 8px;
 }
 
-.lbl:first-child {
-  color: #E24B4A;
+.sun {
+  color: #e53935;
 }
 
-.lbl:last-child {
-  color: #378ADD;
+.sat {
+  color: #1976d2;
 }
 
 .cell {
-  appearance: none;
-  -webkit-appearance: none;
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  font-size: 16px;
-  color: #333;
+  min-height: 96px;
   border: 1px solid #e0e0e0;
   background: #fff;
+  border-radius: 10px;
   cursor: pointer;
-  padding: 0;
+  padding: 10px;
+  text-align: left;
+  font-size: 16px;
+  position: relative;
 }
 
 .cell:hover {
-  background: #f5f5f5;
-}
-
-.cell:focus-visible {
-  outline: 2px solid #378ADD;
-  outline-offset: 2px;
-}
-
-.cell.other {
-  color: #ccc;
-  border: 1px solid #f0f0f0;
-  background: #fafafa;
+  background: #f3f8ff;
 }
 
 .cell.today {
-  background: #378ADD;
-  color: #fff;
-  font-weight: 500;
+  background: #eaf3ff;
+  border-color: #1976d2;
 }
 
-.cell.sun {
-  color: #E24B4A;
+.cell.other {
+  color: #bbb;
+  background: #f8f8f8;
 }
 
-.cell.sat {
-  color: #378ADD;
+.day-num {
+  font-weight: 700;
 }
 
-.cell.today.sun,
-.cell.today.sat {
-  color: #fff;
+.run-dot {
+  width: 10px;
+  height: 10px;
+  background: #1976d2;
+  border-radius: 50%;
+  margin: 18px auto 6px;
 }
 
-.message {
-  margin-top: 1rem;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background: #f9f9f9;
-  color: #333;
-  font-size: 15px;
+.run-distance {
+  text-align: center;
+  font-size: 13px;
+}
+
+.summary-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.big {
+  font-size: 38px;
+  font-weight: 800;
+  color: #1976d2;
+}
+
+.green {
+  color: #18a558;
+}
+
+#recentList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recent-item {
+  display: grid;
+  grid-template-columns: 70px 1fr 70px 70px;
+  gap: 8px;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
 }
 
 .modal {
   position: fixed;
   inset: 0;
+  background: rgba(0,0,0,0.45);
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
 }
 
 .modal.open {
   display: flex;
 }
 
-.modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-}
-
 .modal-content {
-  position: relative;
-  background: #fff;
+  background: white;
   border-radius: 16px;
-  padding: 1.5rem;
-  width: min(90%, 420px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
-  z-index: 1;
+  padding: 24px;
+  width: min(90%, 480px);
+  position: relative;
 }
 
 .modal-close {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  right: 16px;
+  top: 12px;
   border: none;
-  background: transparent;
-  font-size: 1.5rem;
+  background: none;
+  font-size: 24px;
   cursor: pointer;
-  color: #333;
 }
 
-.modal-close:hover {
-  color: #000;
+pre {
+  white-space: pre-wrap;
+  font-family: inherit;
+  line-height: 1.6;
 }
 
-#modalText {
-  margin: 0;
-  font-size: 1rem;
-  color: #333;
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
 }
