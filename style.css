@@ -385,5 +385,23 @@ padding:
 font-size:15px;
 
 }
+  .week-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.week-btn {
+  border: none;
+  background: #eee;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.range-text {
+  color: #666;
+  margin-bottom: 8px;
+}
 
 }
