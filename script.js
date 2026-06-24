@@ -21,6 +21,10 @@ async function loadData() {
   allData = await res.json();
 }
 
+function onlyRun(items) {
+  return items.filter(item => item.type === 'ランニング');
+}
+
 function getMonthItems(y, m) {
   return allData.filter(item => item.date?.startsWith(`${y}-${pad2(m)}`));
 }
@@ -30,9 +34,7 @@ function getDateItems(dateKey) {
 }
 
 function sumDistance(items) {
-  return items
-    .filter(item => item.type === 'ランニング')
-    .reduce((sum, item) => sum + Number(item.distance_km || 0), 0);
+  return items.reduce((sum, item) => sum + Number(item.distance_km || 0), 0);
 }
 
 function getWeekRange(offset = 0) {
@@ -55,11 +57,12 @@ function getWeekRange(offset = 0) {
 
 function renderSummary(y, m) {
   const monthItems = getMonthItems(y, m + 1);
-  const monthDistance = sumDistance(monthItems);
+  const monthRunItems = onlyRun(monthItems);
+  const monthDistance = sumDistance(monthRunItems);
 
   document.getElementById('monthLabel').textContent = `${y}年${m + 1}月の距離`;
   document.getElementById('monthDistance').textContent = `${monthDistance.toFixed(2)} km`;
-  document.getElementById('monthRuns').textContent = `${monthItems.length}回のラン`;
+  document.getElementById('monthRuns').textContent = `${monthRunItems.length}回のラン`;
 
   const { monday, sunday } = getWeekRange(weekOffset);
 
@@ -68,17 +71,19 @@ function renderSummary(y, m) {
     return d >= monday && d <= sunday;
   });
 
+  const weekRunItems = onlyRun(weekItems);
+
   document.getElementById('weekRange').textContent =
     `${monday.getMonth() + 1}/${monday.getDate()}〜${sunday.getMonth() + 1}/${sunday.getDate()}`;
 
   document.getElementById('weekDistance').textContent =
-    `${sumDistance(weekItems).toFixed(2)} km`;
+    `${sumDistance(weekRunItems).toFixed(2)} km`;
 
   document.getElementById('weekRuns').textContent =
-    `${weekItems.length}回のラン`;
+    `${weekRunItems.length}回のラン`;
 
-  renderRecent(monthItems);
-  drawMonthChart(y, m + 1, monthItems);
+  renderRecent(monthRunItems);
+  drawMonthChart(y, m + 1, monthRunItems);
 }
 
 function renderRecent(items) {
@@ -152,16 +157,17 @@ function renderCalendar() {
   for (let d = 1; d <= days; d++) {
     const dateKey = getDateKey(y, m + 1, d);
     const items = getDateItems(dateKey);
-    const distance = sumDistance(items);
+    const runItems = onlyRun(items);
+    const distance = sumDistance(runItems);
 
     const cell = document.createElement('button');
     cell.className = 'cell';
     cell.innerHTML = `
       <div class="day-num">${d}</div>
-      ${items.length ? `<div class="run-dot"></div><div class="run-distance">${distance.toFixed(2)} km</div>` : ''}
+      ${runItems.length ? `<div class="run-dot"></div><div class="run-distance">${distance.toFixed(2)} km</div>` : ''}
     `;
 
-    cell.addEventListener('click', () => showDayDetail(y, m + 1, d, items));
+    cell.addEventListener('click', () => showDayDetail(y, m + 1, d, runItems));
     grid.appendChild(cell);
   }
 
@@ -170,7 +176,7 @@ function renderCalendar() {
 
 function showDayDetail(y, m, d, items) {
   if (!items.length) {
-    modalText.textContent = `${y}年 ${m}月 ${d}日\n\nデータがありません`;
+    modalText.textContent = `${y}年 ${m}月 ${d}日\n\nランニングデータがありません`;
   } else {
     modalText.textContent =
       `${y}年 ${m}月 ${d}日\n\n` +
