@@ -1,31 +1,64 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>カレンダー</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>トレーニングカレンダー</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
-  <div class="header">
-    <button class="nav" id="prev">＜</button>
-    <div class="month-title" id="title"></div>
-    <button class="nav" id="next">＞</button>
-  </div>
-  <div class="grid" id="grid">
-    <div class="lbl">日</div><div class="lbl">月</div><div class="lbl">火</div>
-    <div class="lbl">水</div><div class="lbl">木</div><div class="lbl">金</div><div class="lbl">土</div>
+
+<div class="layout">
+  <main class="calendar-area">
+    <div class="header">
+      <button class="nav" id="prev">＜</button>
+      <div class="month-title" id="title"></div>
+      <button class="nav" id="next">＞</button>
+    </div>
+
+    <div class="grid" id="grid">
+      <div class="lbl sun">日</div>
+      <div class="lbl">月</div>
+      <div class="lbl">火</div>
+      <div class="lbl">水</div>
+      <div class="lbl">木</div>
+      <div class="lbl">金</div>
+      <div class="lbl sat">土</div>
+    </div>
+  </main>
+
+  <aside class="summary-area">
+    <div class="card">
+      <h2 id="monthLabel">月間距離</h2>
+      <div class="big" id="monthDistance">0 km</div>
+      <p id="monthRuns">0回のラン</p>
+    </div>
+
+    <div class="card">
+      <h2>週間距離</h2>
+      <div class="big green" id="weekDistance">0 km</div>
+      <p id="weekRuns">0回のラン</p>
+    </div>
+
+    <div class="card">
+      <h2>月間距離グラフ</h2>
+      <canvas id="monthChart" height="160"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>最近のラン記録</h2>
+      <div id="recentList"></div>
+    </div>
+  </aside>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <button id="modalClose" class="modal-close">×</button>
+    <pre id="modalText"></pre>
   </div>
 </div>
 
-<div id="modal" class="modal" aria-hidden="true">
-  <div class="modal-backdrop"></div>
-  <div class="modal-content" role="dialog" aria-modal="true">
-    <button class="modal-close" id="modalClose" type="button">×</button>
-    <pre id="modalText" class="modal-text">日付をクリックするとここに表示されます。</pre>
-  </div>
-</div>
 <script src="script.js"></script>
 </body>
 </html>
