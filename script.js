@@ -1,5 +1,6 @@
 let cur = new Date();
 let allData = [];
+let weekOffset = 0;
 
 const DATA_URL =
   'https://raw.githubusercontent.com/training-hiroki/strave-calendar-api/main/data.json';
@@ -32,6 +33,24 @@ function sumDistance(items) {
   return items.reduce((sum, item) => sum + Number(item.distance_km || 0), 0);
 }
 
+function getWeekRange(offset = 0) {
+  const base = new Date();
+  base.setDate(base.getDate() + offset * 7);
+
+  const dayOfWeek = base.getDay();
+  const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+
+  const monday = new Date(base);
+  monday.setDate(base.getDate() + diffToMonday);
+  monday.setHours(0, 0, 0, 0);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+
+  return { monday, sunday };
+}
+
 function renderSummary(y, m) {
   const monthItems = getMonthItems(y, m + 1);
   const monthDistance = sumDistance(monthItems);
@@ -40,72 +59,19 @@ function renderSummary(y, m) {
   document.getElementById('monthDistance').textContent = `${monthDistance.toFixed(2)} km`;
   document.getElementById('monthRuns').textContent = `${monthItems.length}回のラン`;
 
-  const today = new Date();
+  const { monday, sunday } = getWeekRange(weekOffset);
 
-/* 月曜開始 */
+  const weekItems = allData.filter(item => {
+    const d = new Date(item.date);
+    return d >= monday && d <= sunday;
+  });
 
-const monday = new Date(today);
-
-const dayOfWeek =
-today.getDay();
-
-const diff =
-dayOfWeek === 0
-? -6
-: 1 - dayOfWeek;
-
-monday.setDate(
-today.getDate()
-+ diff
-);
-
-monday.setHours(
-0,
-0,
-0,
-0
-);
-
-/* 日曜終了 */
-
-const sunday =
-new Date(
-monday
-);
-
-sunday.setDate(
-monday.getDate()
-+ 6
-);
-
-sunday.setHours(
-23,
-59,
-59,
-999
-);
-
-/* 今週(月〜日)抽出 */
-
-const weekItems =
-allData.filter(
-item => {
-
-const d =
-new Date(
-item.date
-);
-
-return (
-d >= monday &&
-d <= sunday
-);
-
-}
-);
+  document.getElementById('weekRange').textContent =
+    `${monday.getMonth() + 1}/${monday.getDate()}〜${sunday.getMonth() + 1}/${sunday.getDate()}`;
 
   document.getElementById('weekDistance').textContent =
     `${sumDistance(weekItems).toFixed(2)} km`;
+
   document.getElementById('weekRuns').textContent =
     `${weekItems.length}回のラン`;
 
@@ -232,6 +198,16 @@ document.getElementById('prev').addEventListener('click', () => {
 
 document.getElementById('next').addEventListener('click', () => {
   cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+  renderCalendar();
+});
+
+document.getElementById('prevWeek').addEventListener('click', () => {
+  weekOffset--;
+  renderCalendar();
+});
+
+document.getElementById('nextWeek').addEventListener('click', () => {
+  weekOffset++;
   renderCalendar();
 });
 
