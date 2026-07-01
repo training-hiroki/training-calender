@@ -3,8 +3,7 @@ let allData = [];
 let weekOffset = 0;
 
 const DATA_URL =
-  'https://raw.githubusercontent.com/training-hiroki/strave-calendar-api/main/data.json';
-
+  'https://raw.githubusercontent.com/training-hiroki/strave-calendar-api/main/%E3%83%87%E3%83%BC%E3%82%BF/data.json';
 const pad2 = n => String(n).padStart(2, '0');
 
 const grid = document.getElementById('grid');
